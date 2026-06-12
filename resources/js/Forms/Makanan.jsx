@@ -1,5 +1,6 @@
-import { useForm } from "@inertiajs/react";
+import { Link, useForm } from "@inertiajs/react";
 import { useState } from "react";
+import { storageUrl } from "../Utils/storageUrl";
 
 export default function FormMakanan({
   makanan = {
@@ -27,7 +28,7 @@ export default function FormMakanan({
     _method: type === "create" ? "POST" : "PUT",
   });
 
-  const [preview, setPreview] = useState(makanan.gambar ? `/storage/${makanan.gambar}` : null);
+  const [preview, setPreview] = useState(storageUrl(makanan.gambar, null));
 
   function submit(e) {
     e.preventDefault();
@@ -50,123 +51,177 @@ export default function FormMakanan({
   };
 
   return (
-    <form onSubmit={submit}>
-      <fieldset className="fieldset">
-        <legend className="fieldset-legend">Menu Makanan</legend>
+    <form onSubmit={submit} className="admin-food-form">
+      <fieldset className="admin-food-form-card">
+        <legend className="admin-food-form__legend">Menu Makanan</legend>
 
-        <label className="label">Nama</label>
-        <input
-          type="text"
-          className="input"
-          placeholder="Nama"
-          value={data.nama}
-          onChange={(e) => setData("nama", e.target.value)}
-        />
-        {errors.nama && <span className="text-error">{errors.nama}</span>}
+        <div className="admin-food-form__layout">
+          <div className="admin-food-form__inputs">
+            <div className="admin-form-field">
+              <label className="label">Nama</label>
+              <input
+                type="text"
+                className="input"
+                placeholder="Nama makanan"
+                value={data.nama}
+                onChange={(e) => setData("nama", e.target.value)}
+              />
+              {errors.nama && <span className="text-error">{errors.nama}</span>}
+            </div>
 
-        <label className="label">Kategori</label>
-        <select
-          value={data.kategori}
-          className="select"
-          onChange={(e) => setData("kategori", e.target.value)}
-        >
-          <option value="">Pilih Kategori</option>
-          <option value="Karbo">Karbo</option>
-          <option value="Protein">Protein</option>
-          <option value="Lemak">Lemak</option>
-          <option value="Sayur">Sayur</option>
-          <option value="Buah">Buah</option>
-          <option value="Lain-lain">Lain-lain</option>
-        </select>
-        {errors.kategori && (
-          <span className="text-error">{errors.kategori}</span>
-        )}
+            <div className="admin-form-field">
+              <label className="label">Kategori</label>
+              <select
+                value={data.kategori}
+                className="select"
+                onChange={(e) => setData("kategori", e.target.value)}
+              >
+                <option value="">Pilih Kategori</option>
+                <option value="Karbo">Karbo</option>
+                <option value="Protein">Protein</option>
+                <option value="Lemak">Lemak</option>
+                <option value="Sayur">Sayur</option>
+                <option value="Buah">Buah</option>
+                <option value="Lain-lain">Lain-lain</option>
+              </select>
+              {errors.kategori && (
+                <span className="text-error">{errors.kategori}</span>
+              )}
+            </div>
 
-        <label className="label">Kalori</label>
-        <input
-          step="any"
-          type="number"
-          className="input"
-          placeholder="Kalori"
-          value={data.kalori}
-          onChange={(e) => setData("kalori", e.target.value)}
-        />
-        {errors.kalori && <span className="text-error">{errors.kalori}</span>}
+            <div className="admin-form-field">
+              <label className="label">Kalori</label>
+              <input
+                step="any"
+                type="number"
+                className="input"
+                placeholder="Kalori"
+                value={data.kalori}
+                onChange={(e) => setData("kalori", e.target.value)}
+              />
+              {errors.kalori && (
+                <span className="text-error">{errors.kalori}</span>
+              )}
+            </div>
 
-        <label className="label">Karbohidrat</label>
-        <input
-          step="any"
-          type="number"
-          className="input"
-          placeholder="Karbohidrat"
-          value={data.karbohidrat}
-          onChange={(e) => setData("karbohidrat", e.target.value)}
-        />
-        {errors.karbohidrat && (
-          <span className="text-error">{errors.karbohidrat}</span>
-        )}
+            <div className="admin-form-field">
+              <label className="label">Karbohidrat</label>
+              <input
+                step="any"
+                type="number"
+                className="input"
+                placeholder="Karbohidrat"
+                value={data.karbohidrat}
+                onChange={(e) => setData("karbohidrat", e.target.value)}
+              />
+              {errors.karbohidrat && (
+                <span className="text-error">{errors.karbohidrat}</span>
+              )}
+            </div>
 
-        <label className="label">Protein</label>
-        <input
-          step="any"
-          type="number"
-          className="input"
-          placeholder="Protein"
-          value={data.protein}
-          onChange={(e) => setData("protein", e.target.value)}
-        />
-        {errors.protein && <span className="text-error">{errors.protein}</span>}
+            <div className="admin-form-field">
+              <label className="label">Protein</label>
+              <input
+                step="any"
+                type="number"
+                className="input"
+                placeholder="Protein"
+                value={data.protein}
+                onChange={(e) => setData("protein", e.target.value)}
+              />
+              {errors.protein && (
+                <span className="text-error">{errors.protein}</span>
+              )}
+            </div>
 
-        <label className="label">Lemak</label>
-        <input
-          step="any"
-          type="number"
-          className="input"
-          placeholder="Lemak"
-          value={data.lemak}
-          onChange={(e) => setData("lemak", e.target.value)}
-        />
-        {errors.lemak && <span className="text-error">{errors.lemak}</span>}
+            <div className="admin-form-field">
+              <label className="label">Lemak</label>
+              <input
+                step="any"
+                type="number"
+                className="input"
+                placeholder="Lemak"
+                value={data.lemak}
+                onChange={(e) => setData("lemak", e.target.value)}
+              />
+              {errors.lemak && (
+                <span className="text-error">{errors.lemak}</span>
+              )}
+            </div>
 
-        <label className="label">Satuan</label>
-        <input
-          type="text"
-          className="input"
-          placeholder="Satuan"
-          value={data.satuan}
-          onChange={(e) => setData("satuan", e.target.value)}
-        />
-        {errors.satuan && <span className="text-error">{errors.satuan}</span>}
+            <div className="admin-form-field admin-form-field--full">
+              <label className="label">Satuan</label>
+              <input
+                type="text"
+                className="input"
+                placeholder="Contoh: 100 gram, 1 porsi"
+                value={data.satuan}
+                onChange={(e) => setData("satuan", e.target.value)}
+              />
+              {errors.satuan && (
+                <span className="text-error">{errors.satuan}</span>
+              )}
+            </div>
 
-        <label className="label">Gambar</label>
-        <input
-          accept="image/*"
-          type="file"
-          className="file-input"
-          onChange={handleImageChange}
-        />
-        {errors.gambar && <span className="text-error">{errors.gambar}</span>}
+            {progress && (
+              <progress
+                className="admin-food-form__progress admin-form-field--full"
+                value={progress.percentage}
+                max="100"
+              >
+                {progress.percentage}%
+              </progress>
+            )}
 
-        {preview && (
-          <div className="mb-4">
-            <p className="text-sm mb-1">Preview:</p>
-            <img
-              src={preview}
-              alt="Preview"
-              className="w-full object-cover rounded"
-            />
+            <div className="admin-food-form__actions admin-form-field--full">
+              <button
+                className="btn btn-primary admin-food-save-button"
+                disabled={processing}
+              >
+                {processing ? "Menyimpan..." : "Simpan"}
+              </button>
+              <Link href="/admin/menu-makanan" className="btn btn-soft">
+                Batal
+              </Link>
+            </div>
           </div>
-        )}
 
-        {progress && (
-          <progress value={progress.percentage} max="100">
-            {progress.percentage}%
-          </progress>
-        )}
+          <aside className="admin-food-image-panel">
+            <div className="admin-food-image-panel__header">
+              <h3>Gambar Makanan</h3>
+              <p>Upload gambar untuk membantu pengguna mengenali makanan.</p>
+            </div>
 
-        <button className="btn btn-primary w-full mt-4" disabled={processing}>
-          {processing ? "Menyimpan..." : "Simpan"}
-        </button>
+            <div className="admin-form-field">
+              <label className="label">Upload Gambar</label>
+              <div className="admin-food-upload">
+                <input
+                  accept="image/*"
+                  type="file"
+                  className="file-input"
+                  onChange={handleImageChange}
+                />
+                <span className="form-hint">
+                  Gunakan gambar makanan yang jelas. Format JPG atau PNG.
+                </span>
+              </div>
+              {errors.gambar && (
+                <span className="text-error">{errors.gambar}</span>
+              )}
+            </div>
+
+            <figure className="admin-food-preview">
+              <figcaption>Preview Gambar</figcaption>
+              {preview ? (
+                <img src={preview} alt="Preview makanan" />
+              ) : (
+                <div className="admin-food-preview__empty">
+                  Belum ada gambar dipilih.
+                </div>
+              )}
+            </figure>
+          </aside>
+        </div>
       </fieldset>
     </form>
   );

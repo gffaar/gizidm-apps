@@ -10,6 +10,7 @@ import {
   faVenusMars,
 } from "@fortawesome/free-solid-svg-icons";
 import LayoutUser from "../../Layouts/User";
+import { storageUrl } from "../../Utils/storageUrl";
 
 const fallbackPhoto = "/no_profile_picture.png";
 
@@ -78,7 +79,7 @@ export default function AccountProfileUser() {
   const { user, profil, profilUser } = usePage().props;
   const healthProfile = profil || user?.pengguna || {};
   const accountProfile = profilUser || user?.profil_user || {};
-  const profilePhoto = user?.foto ? `/storage/${user.foto}` : fallbackPhoto;
+  const profilePhoto = storageUrl(user?.foto, fallbackPhoto);
   const gender =
     accountProfile?.jenis_kelamin || healthProfile?.jenis_kelamin || "";
   const birthDate =
@@ -103,7 +104,14 @@ export default function AccountProfileUser() {
 
         <section className="account-info-card">
           <div className="account-info-profile">
-            <img src={profilePhoto} alt="Foto Profil" />
+            <img
+              src={profilePhoto}
+              alt="Foto Profil"
+              onError={(event) => {
+                event.currentTarget.onerror = null;
+                event.currentTarget.src = fallbackPhoto;
+              }}
+            />
           </div>
 
           <div className="account-info-grid">

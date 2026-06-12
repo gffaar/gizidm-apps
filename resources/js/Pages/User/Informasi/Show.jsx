@@ -2,10 +2,13 @@ import { Link, usePage } from "@inertiajs/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import LayoutUser from "../../../Layouts/User";
+import { storageUrl } from "../../../Utils/storageUrl";
+
+const DEFAULT_INFO_IMAGE = "/no_image.jpg";
 
 export default function UserInformasiShow() {
   const { informasi } = usePage().props;
-  const gambar = informasi.gambar ? `/storage/${informasi.gambar}` : "/no_image.jpg";
+  const gambar = storageUrl(informasi.gambar, DEFAULT_INFO_IMAGE);
 
   return (
     <LayoutUser>
@@ -22,7 +25,15 @@ export default function UserInformasiShow() {
 
         <article className="card">
           <figure>
-            <img src={gambar} alt={informasi.judul} className="list-card-image" />
+            <img
+              src={gambar}
+              alt={informasi.judul}
+              className="list-card-image"
+              onError={(event) => {
+                event.currentTarget.onerror = null;
+                event.currentTarget.src = DEFAULT_INFO_IMAGE;
+              }}
+            />
           </figure>
           <div className="card-body">
             <h1 className="card-title">{informasi.judul}</h1>

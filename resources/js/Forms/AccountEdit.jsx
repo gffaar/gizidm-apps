@@ -12,6 +12,9 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useMemo, useState } from "react";
 import { confirmLogout } from "../Utils/confirmLogout";
+import { storageUrl } from "../Utils/storageUrl";
+
+const fallbackPhoto = "/no_profile_picture.png";
 
 function calculateAge(tanggalLahir) {
   if (!tanggalLahir) {
@@ -103,7 +106,7 @@ export default function FormAccountEdit({
   });
 
   const [preview, setPreview] = useState(
-    user?.foto ? `/storage/${user.foto}` : "/no_profile_picture.png",
+    storageUrl(user?.foto, fallbackPhoto),
   );
 
   const bmi = useMemo(
@@ -139,9 +142,7 @@ export default function FormAccountEdit({
 
   function handleReset() {
     reset();
-    setPreview(
-      user?.foto ? `/storage/${user.foto}` : "/no_profile_picture.png",
-    );
+    setPreview(storageUrl(user?.foto, fallbackPhoto));
   }
 
   return (
@@ -162,6 +163,10 @@ export default function FormAccountEdit({
             src={preview}
             alt="Foto Profil"
             className="profile-photo-panel__image"
+            onError={(event) => {
+              event.currentTarget.onerror = null;
+              event.currentTarget.src = fallbackPhoto;
+            }}
           />
           <label className="btn btn-soft profile-photo-panel__button">
             <FontAwesomeIcon icon={faCamera} />

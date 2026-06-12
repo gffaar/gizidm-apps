@@ -10,6 +10,9 @@ import {
   faLeaf,
 } from "@fortawesome/free-solid-svg-icons";
 import LayoutUser from "../../../Layouts/User";
+import { storageUrl } from "../../../Utils/storageUrl";
+
+const DEFAULT_FOOD_IMAGE = "/no_image.jpg";
 
 const filterOptions = [
   { label: "Semua", value: "" },
@@ -239,9 +242,7 @@ export default function UserRekomendasiIndex() {
                     return null;
                   }
 
-                  const gambar = makanan.gambar
-                    ? `/storage/${makanan.gambar}`
-                    : `/no_image.jpg`;
+                  const gambar = storageUrl(makanan.gambar, DEFAULT_FOOD_IMAGE);
                   const calories = multiplyNutrition(makanan.kalori, menu.jumlah);
                   const nutrition = [
                     {
@@ -267,7 +268,15 @@ export default function UserRekomendasiIndex() {
                       href={`/user/menu-makanan/${makanan.id}`}
                       className="food-recommendation-card"
                     >
-                      <img src={gambar} alt={makanan.nama} />
+                      <img
+                        src={gambar}
+                        alt={makanan.nama}
+                        loading="lazy"
+                        onError={(event) => {
+                          event.currentTarget.onerror = null;
+                          event.currentTarget.src = DEFAULT_FOOD_IMAGE;
+                        }}
+                      />
                       <div className="food-recommendation-card__body">
                         <div className="food-recommendation-card__top">
                           <p>{makanan.nama}</p>

@@ -12,6 +12,7 @@ import {
   faKitMedical,
   faRightFromBracket,
 } from "@fortawesome/free-solid-svg-icons";
+import { storageUrl } from "../../Utils/storageUrl";
 
 const fallbackPhoto = "/no_profile_picture.png";
 
@@ -21,7 +22,7 @@ function displayValue(value, fallback = "-") {
 
 export default function AccountIndex() {
   const { user, supportsEmail = false } = usePage().props;
-  const profilePhoto = user?.foto ? `/storage/${user.foto}` : fallbackPhoto;
+  const profilePhoto = storageUrl(user?.foto, fallbackPhoto);
   const isAdmin = user?.role === "admin";
   const profileMenu = [
     {
@@ -74,7 +75,14 @@ export default function AccountIndex() {
         <section className="profile-legacy-card">
           <div className="profile-legacy-hero">
             <div className="profile-legacy-avatar">
-              <img src={profilePhoto} alt="Foto Profil" />
+              <img
+                src={profilePhoto}
+                alt="Foto Profil"
+                onError={(event) => {
+                  event.currentTarget.onerror = null;
+                  event.currentTarget.src = fallbackPhoto;
+                }}
+              />
             </div>
           </div>
 

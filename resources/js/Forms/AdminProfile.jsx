@@ -6,11 +6,12 @@ import {
   faUserGear,
 } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
+import { storageUrl } from "../Utils/storageUrl";
 
 const fallbackPhoto = "/no_profile_picture.png";
 
 function imageUrl(user) {
-  return user?.foto ? `/storage/${user.foto}` : fallbackPhoto;
+  return storageUrl(user?.foto, fallbackPhoto);
 }
 
 export default function AdminProfileForm({ user = null, supportsEmail = false }) {

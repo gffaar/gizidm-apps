@@ -8,6 +8,9 @@ import {
   faFire,
   faLeaf,
 } from "@fortawesome/free-solid-svg-icons";
+import { storageUrl } from "../../../Utils/storageUrl";
+
+const DEFAULT_FOOD_IMAGE = "/no_image.jpg";
 
 function formatNutrition(value) {
   if (value === null || value === undefined || value === "") {
@@ -29,7 +32,7 @@ function formatNutrition(value) {
 
 export default function UserMakananShow() {
   const { makanan } = usePage().props;
-  const gambar = makanan.gambar ? `/storage/${makanan.gambar}` : `/no_image.jpg`;
+  const gambar = storageUrl(makanan.gambar, DEFAULT_FOOD_IMAGE);
   const nutritionItems = [
     {
       label: "Kalori",
@@ -87,7 +90,15 @@ export default function UserMakananShow() {
         </div>
 
         <section className="meal-detail-nutrition-card">
-          <img src={gambar} alt={makanan.nama} className="meal-detail-nutrition-image" />
+          <img
+            src={gambar}
+            alt={makanan.nama}
+            className="meal-detail-nutrition-image"
+            onError={(event) => {
+              event.currentTarget.onerror = null;
+              event.currentTarget.src = DEFAULT_FOOD_IMAGE;
+            }}
+          />
 
           <div className="meal-detail-nutrition-body">
             <h1>Detail Gizi Makanan per 100 g</h1>

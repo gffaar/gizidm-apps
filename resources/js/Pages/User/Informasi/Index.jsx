@@ -8,6 +8,9 @@ import {
   faHeartbeat,
 } from "@fortawesome/free-solid-svg-icons";
 import LayoutUser from "../../../Layouts/User";
+import { storageUrl } from "../../../Utils/storageUrl";
+
+const DEFAULT_INFO_IMAGE = "/no_image.jpg";
 
 function formatDate(value) {
   return new Date(value).toLocaleDateString("id-ID", {
@@ -123,13 +126,14 @@ export default function UserInformasiIndex() {
                   className="info-list-card"
                 >
                   <img
-                    src={
-                      informasi.gambar
-                        ? `/storage/${informasi.gambar}`
-                        : "/no_image.jpg"
-                    }
+                    src={storageUrl(informasi.gambar, DEFAULT_INFO_IMAGE)}
                     alt={informasi.judul}
                     className="info-list-card__image"
+                    loading="lazy"
+                    onError={(event) => {
+                      event.currentTarget.onerror = null;
+                      event.currentTarget.src = DEFAULT_INFO_IMAGE;
+                    }}
                   />
                   <div className="info-list-card__body">
                     <span

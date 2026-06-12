@@ -9,8 +9,8 @@ export default function AdminInformasiEdit() {
 
   return (
     <LayoutAdmin>
-      <div className="page-stack">
-        <div className="page-header">
+      <div className="admin-page-stack admin-info-form-page">
+        <section className="admin-page-heading admin-info-form-heading">
           <Link
             href={`/admin/informasi/${informasi.id}`}
             className="back-link"
@@ -18,11 +18,15 @@ export default function AdminInformasiEdit() {
           >
             <FontAwesomeIcon icon={faArrowLeft} />
           </Link>
-          <div className="page-header__content">
-            <p className="page-title">Edit Informasi</p>
-            <p className="page-subtitle">Perbarui artikel edukasi diabetes</p>
+          <div>
+            <p className="admin-page-heading__eyebrow">
+              Kelola Edukasi Diabetes
+            </p>
+            <h2>Edit Informasi</h2>
+            <p>Perbarui artikel edukasi diabetes.</p>
           </div>
-        </div>
+        </section>
+
         <FormInformasi informasi={informasi} type="edit" />
       </div>
     </LayoutAdmin>

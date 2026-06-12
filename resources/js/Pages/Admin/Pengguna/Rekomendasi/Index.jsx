@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { storageUrl } from "../../../../Utils/storageUrl";
 
 export default function AdminPenggunaRekomendasiIndex() {
   const { pengguna, rekamGizi, menuRekomendasi = [], filters = {}, total = {}, hasMenuMakanan = true } =
@@ -121,19 +122,11 @@ export default function AdminPenggunaRekomendasiIndex() {
                 return (
                 <tr key={menu.id}>
                   <th>
-                    {makanan.gambar ? (
-                      <img
-                        src={`/storage/${makanan.gambar}`}
-                        alt="Makanan"
-                        style={{ minWidth: "100px", maxWidth: "100px" }}
-                      />
-                    ) : (
-                      <img
-                        src={`/no_image.jpg`}
-                        alt="Makanan"
-                        style={{ minWidth: "100px", maxWidth: "100px" }}
-                      />
-                    )}
+                    <img
+                      src={storageUrl(makanan.gambar)}
+                      alt="Makanan"
+                      style={{ minWidth: "100px", maxWidth: "100px" }}
+                    />
                   </th>
                   <td>{makanan.nama}</td>
                   <td>{makanan.kalori * menu.jumlah}</td>

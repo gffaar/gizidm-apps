@@ -1,9 +1,11 @@
 import { Link, router, usePage } from "@inertiajs/react";
 import LayoutAdmin from "../../../Layouts/Admin";
+import { storageUrl } from "../../../Utils/storageUrl";
 import Swal from "sweetalert2";
 
 export default function AdminPenggunaShow() {
   const { pengguna } = usePage().props;
+  const fotoProfil = storageUrl(pengguna.user?.foto, "/no_profile_picture.png");
 
   const handleDelete = () => {
     Swal.fire({
@@ -32,11 +34,11 @@ export default function AdminPenggunaShow() {
         </div>
         <div className="card">
           <figure className="pt-6">
-            {pengguna.user?.foto ? (
-              <img src={`/storage/${pengguna.user.foto}`} alt="Foto Profil" className="h-28 w-28 rounded-full object-cover" />
-            ) : (
-              <img src={`/no_profile_picture.png`} alt="Foto Profil" className="h-28 w-28 rounded-full object-cover" />
-            )}
+            <img
+              src={fotoProfil}
+              alt="Foto Profil"
+              className="h-28 w-28 rounded-full object-cover"
+            />
           </figure>
           <div className="card-body">
             <h2 className="card-title">{pengguna.user?.nama || "Pasien"}</h2>

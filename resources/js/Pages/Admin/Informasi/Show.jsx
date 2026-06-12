@@ -2,11 +2,12 @@ import { Link, router, usePage } from "@inertiajs/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import LayoutAdmin from "../../../Layouts/Admin";
+import { storageUrl } from "../../../Utils/storageUrl";
 import Swal from "sweetalert2";
 
 export default function AdminInformasiShow() {
   const { informasi } = usePage().props;
-  const gambar = informasi.gambar ? `/storage/${informasi.gambar}` : "/no_image.jpg";
+  const gambar = storageUrl(informasi.gambar);
 
   const handleDelete = () => {
     Swal.fire({

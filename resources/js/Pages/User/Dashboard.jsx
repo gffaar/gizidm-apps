@@ -18,6 +18,7 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import LayoutUser from "../../Layouts/User";
+import { storageUrl } from "../../Utils/storageUrl";
 
 ChartJS.register(
   CategoryScale,
@@ -86,25 +87,6 @@ function calculateBmr(weight, height, age, gender) {
 }
 
 const DEFAULT_EDUCATION_IMAGE = "/images/default-diabetes-education.png";
-
-function getEducationImage(gambar) {
-  if (!gambar) {
-    return DEFAULT_EDUCATION_IMAGE;
-  }
-
-  const imagePath = String(gambar);
-
-  if (
-    imagePath.startsWith("/") ||
-    imagePath.startsWith("http://") ||
-    imagePath.startsWith("https://") ||
-    imagePath.startsWith("data:")
-  ) {
-    return imagePath;
-  }
-
-  return `/storage/${imagePath}`;
-}
 
 function getEducationCategory(informasi) {
   if (informasi.kategori) {
@@ -387,7 +369,7 @@ export default function UserDashboard() {
                   role="listitem"
                 >
                   <img
-                    src={getEducationImage(informasi.gambar)}
+                    src={storageUrl(informasi.gambar, DEFAULT_EDUCATION_IMAGE)}
                     alt={informasi.judul || "Informasi edukasi diabetes"}
                     className="education-card__image"
                     loading="lazy"

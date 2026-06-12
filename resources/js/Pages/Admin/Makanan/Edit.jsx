@@ -7,13 +7,13 @@ export default function AdminMakananEdit() {
 
   return (
     <LayoutAdmin>
-      <div className="page-stack">
-        <div className="page-header">
-          <div className="page-header__content">
-            <p className="page-title">Ubah Menu Makanan</p>
-            <p className="page-subtitle">Perbarui data kandungan gizi</p>
-          </div>
-        </div>
+      <div className="admin-page-stack admin-food-form-page">
+        <section className="admin-page-heading admin-food-form-heading">
+          <p className="admin-page-heading__eyebrow">Kelola Data Makanan</p>
+          <h2>Ubah Menu Makanan</h2>
+          <p>Perbarui informasi makanan dan kandungan gizi yang tersimpan.</p>
+        </section>
+
         <FormMakanan makanan={makanan} type="edit" />
       </div>
     </LayoutAdmin>

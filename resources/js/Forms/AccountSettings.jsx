@@ -6,11 +6,12 @@ import {
   faUserGear,
 } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
+import { storageUrl } from "../Utils/storageUrl";
 
 const fallbackPhoto = "/no_profile_picture.png";
 
 function imageUrl(user) {
-  return user?.foto ? `/storage/${user.foto}` : fallbackPhoto;
+  return storageUrl(user?.foto, fallbackPhoto);
 }
 
 export default function FormAccountSettings({
@@ -110,6 +111,10 @@ export default function FormAccountSettings({
             src={preview}
             alt="Preview Foto Profil"
             className="profile-photo-panel__image"
+            onError={(event) => {
+              event.currentTarget.onerror = null;
+              event.currentTarget.src = fallbackPhoto;
+            }}
           />
           <label className="btn btn-soft profile-photo-panel__button">
             <FontAwesomeIcon icon={faCamera} />

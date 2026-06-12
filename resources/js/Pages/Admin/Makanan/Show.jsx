@@ -1,5 +1,6 @@
 import { Link, router, usePage } from "@inertiajs/react";
 import LayoutAdmin from "../../../Layouts/Admin";
+import { storageUrl } from "../../../Utils/storageUrl";
 import Swal from "sweetalert2";
 
 export default function AdminMakananShow() {
@@ -21,7 +22,7 @@ export default function AdminMakananShow() {
     });
   };
 
-  const gambar = makanan.gambar ? `/storage/${makanan.gambar}` : `/no_image.jpg`;
+  const gambar = storageUrl(makanan.gambar);
 
   return (
     <LayoutAdmin>

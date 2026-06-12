@@ -1,7 +1,8 @@
-import { useForm } from "@inertiajs/react";
+import { Link, useForm } from "@inertiajs/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFloppyDisk, faImage, faPlusCircle } from "@fortawesome/free-solid-svg-icons";
+import { faFloppyDisk } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
+import { storageUrl } from "../Utils/storageUrl";
 
 export default function FormInformasi({
   informasi = {
@@ -19,9 +20,7 @@ export default function FormInformasi({
     _method: type === "create" ? "POST" : "PUT",
   });
 
-  const [preview, setPreview] = useState(
-    informasi.gambar ? `/storage/${informasi.gambar}` : null
-  );
+  const [preview, setPreview] = useState(storageUrl(informasi.gambar, null));
 
   function submit(e) {
     e.preventDefault();
@@ -42,65 +41,103 @@ export default function FormInformasi({
     }
   }
 
+  const cancelHref =
+    type === "create" ? "/admin/informasi" : `/admin/informasi/${informasi.id}`;
+
   return (
-    <form onSubmit={submit} className="w-full max-w-xl">
-      <fieldset className="fieldset">
-        <legend className="fieldset-legend">Informasi Diabetes</legend>
+    <form onSubmit={submit} className="admin-info-form">
+      <fieldset className="admin-info-form-card">
+        <legend className="admin-info-form__legend">Informasi Diabetes</legend>
 
-        <label className="label">Judul Informasi</label>
-        <input
-          type="text"
-          className="input"
-          placeholder="Masukkan judul informasi"
-          value={data.judul}
-          onChange={(e) => setData("judul", e.target.value)}
-        />
-        {errors.judul && <span className="text-error">{errors.judul}</span>}
+        <div className="admin-info-form__layout">
+          <div className="admin-info-form__inputs">
+            <div className="admin-form-field">
+              <label className="label">Judul Informasi</label>
+              <input
+                type="text"
+                className="input"
+                placeholder="Masukkan judul informasi"
+                value={data.judul}
+                onChange={(e) => setData("judul", e.target.value)}
+              />
+              {errors.judul && (
+                <span className="text-error">{errors.judul}</span>
+              )}
+            </div>
 
-        <label className="label">Deskripsi</label>
-        <textarea
-          className="textarea textarea-bordered min-h-44 w-full"
-          placeholder="Tuliskan deskripsi informasi..."
-          value={data.deskripsi}
-          onChange={(e) => setData("deskripsi", e.target.value)}
-        />
-        {errors.deskripsi && (
-          <span className="text-error">{errors.deskripsi}</span>
-        )}
+            <div className="admin-form-field">
+              <label className="label">Deskripsi</label>
+              <textarea
+                className="textarea"
+                placeholder="Tuliskan deskripsi informasi..."
+                value={data.deskripsi}
+                onChange={(e) => setData("deskripsi", e.target.value)}
+              />
+              {errors.deskripsi && (
+                <span className="text-error">{errors.deskripsi}</span>
+              )}
+            </div>
 
-        <label className="label">Gambar</label>
-        <label className="upload-box">
-          {preview ? (
-            <img src={preview} alt="Preview" className="upload-box__preview" />
-          ) : (
-            <>
-              <span className="upload-box__icon">
-                <FontAwesomeIcon icon={faImage} />
-                <FontAwesomeIcon icon={faPlusCircle} className="upload-box__plus" />
-              </span>
-              <span className="upload-box__title">Pilih Gambar</span>
-              <span className="upload-box__hint">Format JPG, PNG (Maks. 2MB)</span>
-            </>
-          )}
-          <input
-            accept="image/*"
-            type="file"
-            className="hidden"
-            onChange={handleImageChange}
-          />
-        </label>
-        {errors.gambar && <span className="text-error">{errors.gambar}</span>}
+            {progress && (
+              <progress
+                className="admin-info-form__progress"
+                value={progress.percentage}
+                max="100"
+              >
+                {progress.percentage}%
+              </progress>
+            )}
 
-        {progress && (
-          <progress className="progress progress-primary w-full" value={progress.percentage} max="100">
-            {progress.percentage}%
-          </progress>
-        )}
+            <div className="admin-info-form__actions">
+              <button
+                className="btn btn-primary admin-info-save-button"
+                disabled={processing}
+              >
+                <FontAwesomeIcon icon={faFloppyDisk} />
+                {processing ? "Menyimpan..." : "Simpan Informasi"}
+              </button>
+              <Link href={cancelHref} className="btn btn-soft">
+                Batal
+              </Link>
+            </div>
+          </div>
 
-        <button className="btn btn-primary mt-4" disabled={processing}>
-          <FontAwesomeIcon icon={faFloppyDisk} />
-          Simpan
-        </button>
+          <aside className="admin-info-image-panel">
+            <div className="admin-info-image-panel__header">
+              <h3>Gambar Edukasi</h3>
+              <p>Upload gambar pendukung agar artikel edukasi lebih mudah dipahami.</p>
+            </div>
+
+            <div className="admin-form-field">
+              <label className="label">Upload Gambar</label>
+              <div className="admin-info-upload">
+                <input
+                  accept="image/*"
+                  type="file"
+                  className="file-input"
+                  onChange={handleImageChange}
+                />
+                <span className="form-hint">
+                  Format JPG atau PNG. Gunakan gambar edukasi yang jelas.
+                </span>
+              </div>
+              {errors.gambar && (
+                <span className="text-error">{errors.gambar}</span>
+              )}
+            </div>
+
+            <figure className="admin-info-preview">
+              <figcaption>Preview Gambar</figcaption>
+              {preview ? (
+                <img src={preview} alt="Preview informasi edukasi" />
+              ) : (
+                <div className="admin-info-preview__empty">
+                  Belum ada gambar dipilih.
+                </div>
+              )}
+            </figure>
+          </aside>
+        </div>
       </fieldset>
     </form>
   );
