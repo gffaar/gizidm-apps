@@ -34,7 +34,7 @@ class MenuRekomendasiController extends Controller
                 ->with('error', 'Lengkapi data pribadi terlebih dahulu.');
         }
 
-        $rekamGizi = $this->todaySavedRekamGizi($pengguna->id);
+        $rekamGizi = $this->todayRekamGizi($pengguna->id);
 
         if (! $rekamGizi) {
             return $this->dailyCalculationRequiredResponse($pengguna);
@@ -45,15 +45,21 @@ class MenuRekomendasiController extends Controller
             ->where('pengguna_id', $pengguna->id)
             ->whereDate('created_at', today());
         $hasDailyRecommendation = (clone $dailyRecommendationQuery)->exists();
-        $menuRekomendasi = (clone $dailyRecommendationQuery)
-            ->when($search, fn ($query) => $query->where('waktu_makan', $search))
-            ->latest()
+        $dailyRecommendations = (clone $dailyRecommendationQuery)
+            ->orderByRaw("CASE waktu_makan WHEN 'Pagi' THEN 1 WHEN 'Siang' THEN 2 WHEN 'Malam' THEN 3 ELSE 4 END")
+            ->orderBy('id')
             ->get();
+        $menuRekomendasi = $search
+            ? $dailyRecommendations->where('waktu_makan', $search)->values()
+            : $dailyRecommendations;
 
         if (
             ! $request->boolean('auto')
-            && ! $hasDailyRecommendation
             && MenuMakanan::query()->exists()
+            && (
+                ! $hasDailyRecommendation
+                || $this->recommendationsNeedRefresh($dailyRecommendations, $rekamGizi)
+            )
         ) {
             return redirect()->route('user.menu-rekomendasi.otomatis-pilih', [
                 'rekamGizi' => $rekamGizi->id,
@@ -87,7 +93,7 @@ class MenuRekomendasiController extends Controller
                 ->with('error', 'Lengkapi data pribadi terlebih dahulu.');
         }
 
-        $rekamGizi = $this->todaySavedRekamGizi($pengguna->id);
+        $rekamGizi = $this->todayRekamGizi($pengguna->id);
 
         if (! $rekamGizi) {
             return redirect()->route('user.menu-rekomendasi.index');
@@ -117,10 +123,10 @@ class MenuRekomendasiController extends Controller
                 ->with('error', 'Lengkapi data pribadi terlebih dahulu.');
         }
 
-        if (! $this->todaySavedRekamGizi($pengguna->id)) {
+        if (! $this->todayRekamGizi($pengguna->id)) {
             return redirect()
                 ->route('user.menu-rekomendasi.index')
-                ->with('error', 'Silakan hitung kebutuhan gizi harian terlebih dahulu untuk melihat rekomendasi makanan.');
+                ->with('error', 'Silakan hitung kebutuhan gizi terlebih dahulu untuk melihat rekomendasi makanan hari ini.');
         }
 
         $data = $request->validate([
@@ -162,7 +168,6 @@ class MenuRekomendasiController extends Controller
         if (
             ! $rekamGizi->tanggal
             || ! Carbon::parse($rekamGizi->tanggal)->isToday()
-            || ! $rekamGizi->hasil_disimpan_at
         ) {
             return redirect()->route('user.menu-rekomendasi.index');
         }
@@ -186,15 +191,14 @@ class MenuRekomendasiController extends Controller
         });
 
         return redirect()
-            ->route('user.menu-rekomendasi.index')
+            ->route('user.menu-rekomendasi.index', ['auto' => 1])
             ->with('success', 'Rekomendasi menu berhasil dibuat.');
     }
 
-    private function todaySavedRekamGizi(int $penggunaId): ?RekamGizi
+    private function todayRekamGizi(int $penggunaId): ?RekamGizi
     {
         return RekamGizi::where('pengguna_id', $penggunaId)
             ->whereDate('tanggal', today())
-            ->whereNotNull('hasil_disimpan_at')
             ->latest('tanggal')
             ->latest('id')
             ->first();
@@ -220,7 +224,7 @@ class MenuRekomendasiController extends Controller
 
     private function totals($menuRekomendasi): array
     {
-        return $menuRekomendasi->reduce(function (array $total, MenuRekomendasi $menu) {
+        $totals = $menuRekomendasi->reduce(function (array $total, MenuRekomendasi $menu) {
             if (! $menu->menuMakanan) {
                 return $total;
             }
@@ -237,5 +241,97 @@ class MenuRekomendasiController extends Controller
             'protein' => 0,
             'lemak' => 0,
         ]);
+
+        return array_map(fn ($value) => round((float) $value, 1), $totals);
+    }
+
+    private function recommendationsNeedRefresh($menuRekomendasi, RekamGizi $rekamGizi): bool
+    {
+        if ($menuRekomendasi->isEmpty()) {
+            return true;
+        }
+
+        foreach (['Pagi', 'Siang', 'Malam'] as $mealTime) {
+            $mealMenus = $menuRekomendasi->where('waktu_makan', $mealTime);
+
+            if (
+                ! $this->hasMenuCategory($mealMenus, 'Karbo')
+                || ! $this->hasMenuCategory($mealMenus, 'Protein')
+                || ! $this->hasMenuCategory($mealMenus, 'Sayur')
+            ) {
+                return true;
+            }
+        }
+
+        $totals = $this->totals($menuRekomendasi);
+
+        return $totals['kalori'] < ((float) $rekamGizi->kalori_total * 0.95)
+            || $totals['kalori'] > ((float) $rekamGizi->kalori_total * 1.05)
+            || $totals['karbohidrat'] < ((float) $rekamGizi->karbohidrat * 0.9)
+            || $totals['karbohidrat'] > ((float) $rekamGizi->karbohidrat * 1.1)
+            || $totals['protein'] < ((float) $rekamGizi->protein * 0.9)
+            || $totals['protein'] > ((float) $rekamGizi->protein * 1.1)
+            || $totals['lemak'] < ((float) $rekamGizi->lemak * 0.9)
+            || $totals['lemak'] > ((float) $rekamGizi->lemak * 1.1);
+    }
+
+    private function hasMenuCategory($menuRekomendasi, string $expectedCategory): bool
+    {
+        return $menuRekomendasi->contains(function (MenuRekomendasi $menu) use ($expectedCategory) {
+            if (! $menu->menuMakanan) {
+                return false;
+            }
+
+            return $this->menuCategory($menu->menuMakanan) === $expectedCategory;
+        });
+    }
+
+    private function menuCategory(MenuMakanan $menu): string
+    {
+        $category = mb_strtolower((string) $menu->kategori);
+        $name = mb_strtolower((string) $menu->nama);
+
+        if (str_contains($category, 'karbo') || $this->containsAny($name, ['nasi', 'beras', 'kentang', 'ubi', 'jagung', 'oat', 'oatmeal', 'roti', 'gandum'])) {
+            return 'Karbo';
+        }
+
+        if (str_contains($category, 'protein') || $this->containsAny($name, ['ayam', 'ikan', 'telur', 'tahu', 'tempe', 'daging'])) {
+            return 'Protein';
+        }
+
+        if (str_contains($category, 'sayur') || $this->containsAny($name, ['bayam', 'kangkung', 'brokoli', 'wortel', 'buncis', 'sawi', 'timun', 'tomat', 'labu'])) {
+            return 'Sayur';
+        }
+
+        if (str_contains($category, 'buah') || $this->containsAny($name, ['apel', 'pepaya', 'jeruk', 'jambu', 'buah naga', 'alpukat'])) {
+            return 'Buah';
+        }
+
+        return 'Lain-lain';
+    }
+
+    private function containsAny(string $text, array $keywords): bool
+    {
+        foreach ($keywords as $keyword) {
+            $keyword = mb_strtolower(trim($keyword));
+
+            if ($keyword === '') {
+                continue;
+            }
+
+            if (str_contains($keyword, ' ')) {
+                if (str_contains($text, $keyword)) {
+                    return true;
+                }
+
+                continue;
+            }
+
+            if (preg_match('/(?<![\p{L}\p{N}])'.preg_quote($keyword, '/').'(?![\p{L}\p{N}])/u', $text)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -63,7 +63,7 @@ function calculateBmi(weight, height) {
   }
 
   const tinggiMeter = tinggi / 100;
-  return (berat / (tinggiMeter * tinggiMeter)).toFixed(2);
+  return (berat / (tinggiMeter * tinggiMeter)).toFixed(1);
 }
 
 function calculateBmr(weight, height, age, gender) {
@@ -130,6 +130,8 @@ export default function UserDashboard() {
   const educationItems = Array.isArray(informasiEdukasi)
     ? informasiEdukasi.filter(Boolean)
     : [];
+  const displayName = pengguna?.user?.nama || user?.nama || "User";
+
   const kalori = rekamGiziTerbaru ? parseInt(rekamGiziTerbaru.kalori_total) : 0;
   const gulaDarah = rekamGiziTerbaru ? rekamGiziTerbaru.kadar_gula_darah : 0;
   const profile = {
@@ -140,13 +142,16 @@ export default function UserDashboard() {
       calculateAge(profilUser?.tanggal_lahir || pengguna?.tanggal_lahir),
     jenisKelamin: profilUser?.jenis_kelamin || pengguna?.jenis_kelamin || null,
   };
-  const bmi = calculateBmi(profile.berat, profile.tinggi);
-  const bmr = calculateBmr(
-    profile.berat,
-    profile.tinggi,
-    profile.umur,
-    profile.jenisKelamin
-  );
+  const bmi =
+    rekamGiziTerbaru?.imt ?? calculateBmi(profile.berat, profile.tinggi);
+  const bmr =
+    rekamGiziTerbaru?.bmr ??
+    calculateBmr(
+      profile.berat,
+      profile.tinggi,
+      profile.umur,
+      profile.jenisKelamin
+    );
   const incompleteProfileText = "Lengkapi data profil";
   const chartRecords = chartHistory.length
     ? chartHistory
@@ -256,7 +261,7 @@ export default function UserDashboard() {
           <div>
             <p>Aplikasi Gizi Diabetes</p>
             <h1 className="text-2xl font-bold">
-              Halo, {pengguna?.user?.nama || user?.nama}
+              Halo, {displayName}
             </h1>
             <p>Jaga pola makan, jaga kesehatan.</p>
           </div>

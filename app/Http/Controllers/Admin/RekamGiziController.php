@@ -91,9 +91,12 @@ class RekamGiziController extends Controller
             'bmr' => $nutrition['bmr'],
             'tee' => $nutrition['tee'],
             'kalori_total' => $nutrition['kalori_total'],
+            'energi' => $nutrition['energi'],
             'karbohidrat' => $nutrition['karbohidrat'],
             'protein' => $nutrition['protein'],
             'lemak' => $nutrition['lemak'],
+            'serat' => $nutrition['serat'],
+            'cairan' => $nutrition['cairan'],
             'kadar_gula_darah' => ($data['kadar_gula_darah'] ?? null) !== null ? round((float) $data['kadar_gula_darah'], 2) : null,
             'tanggal' => now(),
         ]);

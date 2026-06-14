@@ -55,9 +55,9 @@ function inferActivity(rekamGizi) {
   const ratio = tee / bmr;
   const factors = [
     { label: "Sangat Ringan", value: 1.2 },
-    { label: "Ringan", value: 1.4 },
-    { label: "Sedang", value: 1.7 },
-    { label: "Berat", value: 2.0 },
+    { label: "Ringan", value: 1.375 },
+    { label: "Sedang", value: 1.55 },
+    { label: "Berat", value: 1.725 },
   ];
 
   return factors.reduce((closest, item) =>

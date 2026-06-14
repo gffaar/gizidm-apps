@@ -53,9 +53,7 @@ function formatImt(value) {
     return value ?? "-";
   }
 
-  return Number.isInteger(number)
-    ? number
-    : number.toFixed(2).replace(/\.?0+$/, "");
+  return number.toFixed(1);
 }
 
 function statusTone(status = "") {

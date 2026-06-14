@@ -101,7 +101,7 @@ class MenuRekomendasiController extends Controller
 
     private function totals($menuRekomendasi): array
     {
-        return $menuRekomendasi->reduce(function (array $total, MenuRekomendasi $menu) {
+        $totals = $menuRekomendasi->reduce(function (array $total, MenuRekomendasi $menu) {
             if (! $menu->menuMakanan) {
                 return $total;
             }
@@ -118,5 +118,7 @@ class MenuRekomendasiController extends Controller
             'protein' => 0,
             'lemak' => 0,
         ]);
+
+        return array_map(fn ($value) => round((float) $value, 1), $totals);
     }
 }

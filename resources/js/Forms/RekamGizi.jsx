@@ -1,6 +1,8 @@
 import { useForm } from "@inertiajs/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faCalculator,
+  faClipboardList,
   faDroplet,
   faLightbulb,
   faNotesMedical,
@@ -124,7 +126,10 @@ export default function FormRekamGizi({
     <form onSubmit={submit} className="nutrition-form">
       <fieldset className="fieldset nutrition-form-card">
         <legend className="fieldset-legend nutrition-form-legend">
-          Input Data
+          <span className="nutrition-form-legend__icon">
+            <FontAwesomeIcon icon={faClipboardList} />
+          </span>
+          <span>Input Data</span>
         </legend>
 
         <div className="nutrition-input-list">
@@ -310,6 +315,7 @@ export default function FormRekamGizi({
         )}
 
         <button className="btn btn-primary nutrition-submit-btn" disabled={processing}>
+          <FontAwesomeIcon icon={faCalculator} />
           {processing ? "Menghitung..." : "Hitung Sekarang"}
         </button>
       </fieldset>

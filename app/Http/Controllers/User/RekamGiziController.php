@@ -36,7 +36,18 @@ class RekamGiziController extends Controller
         $rekamGizi = RekamGizi::where('pengguna_id', $pengguna->id)
             ->latest('tanggal')
             ->latest('id')
-            ->get(['id', 'pengguna_id', 'tanggal', 'imt', 'status_gizi']);
+            ->get([
+                'id',
+                'pengguna_id',
+                'tanggal',
+                'berat_badan',
+                'tinggi_badan',
+                'imt',
+                'bmr',
+                'kalori_total',
+                'kadar_gula_darah',
+                'status_gizi',
+            ]);
 
         return Inertia::render('User/RekamGizi/Index', [
             'rekamGizi' => $rekamGizi,
@@ -129,9 +140,12 @@ class RekamGiziController extends Controller
             'bmr' => $nutrition['bmr'],
             'tee' => $nutrition['tee'],
             'kalori_total' => $nutrition['kalori_total'],
+            'energi' => $nutrition['energi'],
             'karbohidrat' => $nutrition['karbohidrat'],
             'protein' => $nutrition['protein'],
             'lemak' => $nutrition['lemak'],
+            'serat' => $nutrition['serat'],
+            'cairan' => $nutrition['cairan'],
             'kadar_gula_darah' => ($data['kadar_gula_darah'] ?? null) !== null ? round((float) $data['kadar_gula_darah'], 2) : null,
             'tanggal' => now(),
         ]);
@@ -169,9 +183,9 @@ class RekamGiziController extends Controller
 
         abort_unless($pengguna && $rekamGizi->pengguna_id === $pengguna->id, 404);
 
-        $energi = round((float) $rekamGizi->kalori_total, 2);
-        $serat = round(($energi / 1000) * 14, 2);
-        $cairan = round((float) $rekamGizi->berat_badan * 30, 2);
+        $energi = (int) round((float) $rekamGizi->kalori_total);
+        $serat = round(($energi * 14) / 1000, 1);
+        $cairan = (int) round((float) $rekamGizi->berat_badan * 30);
 
         $rekamGizi->update([
             'energi' => $energi,

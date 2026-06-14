@@ -71,9 +71,12 @@ function formatPortionAmount(value, unit) {
   const totalAmount = baseAmount * portion;
   const totalWeight = weightAmount ? weightAmount * portion : null;
   const half = "\u00bd";
+  const countableLabels = ["butir", "potong", "lembar", "buah", "mangkuk"];
 
   if (/\b(g|gr|gram)\b/.test(normalizedLabel)) {
-    return `${roundToStep(totalAmount, 50)} gram`;
+    const step = totalAmount < 100 ? 25 : 50;
+
+    return `${roundToStep(totalAmount, step)} gram`;
   }
 
   if (/\bml\b/.test(normalizedLabel)) {
@@ -92,6 +95,12 @@ function formatPortionAmount(value, unit) {
     }
 
     return `${Math.floor(roundedPortion)}${half} porsi`;
+  }
+
+  if (countableLabels.some((item) => normalizedLabel.includes(item))) {
+    const roundedAmount = Math.max(1, Math.round(totalAmount));
+
+    return `${roundedAmount} ${label}`;
   }
 
   if (totalWeight && weightUnit) {
@@ -196,8 +205,8 @@ export default function UserRekomendasiIndex() {
             <section className="empty-state food-recommendation-empty">
               <p className="empty-state__title">Belum ada rekomendasi makanan hari ini</p>
               <p className="empty-state__text">
-                Belum ada rekomendasi makanan hari ini. Silakan hitung kebutuhan
-                gizi terlebih dahulu.
+                Silakan hitung kebutuhan gizi terlebih dahulu untuk melihat
+                rekomendasi makanan hari ini.
               </p>
               <Link href="/user/rekam-gizi/create" className="btn btn-primary">
                 <FontAwesomeIcon icon={faCalculator} />

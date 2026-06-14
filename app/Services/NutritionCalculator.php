@@ -13,18 +13,20 @@ class NutritionCalculator
         $imt = $weight / ($heightMeter * $heightMeter);
         $statusGizi = $this->statusGizi($imt);
         $bmr = $this->bmr($weight, $height, $age, $data['jenis_kelamin']);
-        $tee = $bmr * $this->activityFactor($data['aktivitas']);
-        $kalori = $this->adjustCalories($tee, $statusGizi);
+        $energy = (int) round($bmr * $this->activityFactor($data['aktivitas']));
 
         return [
-            'imt' => round($imt, 2),
+            'imt' => round($imt, 1),
             'status_gizi' => $statusGizi,
-            'bmr' => round($bmr, 2),
-            'tee' => round($tee, 2),
-            'kalori_total' => round($kalori, 2),
-            'karbohidrat' => round((0.55 * $kalori) / 4, 2),
-            'protein' => round((0.15 * $kalori) / 4, 2),
-            'lemak' => round((0.30 * $kalori) / 9, 2),
+            'bmr' => (int) round($bmr),
+            'tee' => $energy,
+            'kalori_total' => $energy,
+            'energi' => $energy,
+            'karbohidrat' => round((0.55 * $energy) / 4, 1),
+            'protein' => round((0.15 * $energy) / 4, 1),
+            'lemak' => round((0.30 * $energy) / 9, 1),
+            'serat' => round(($energy * 14) / 1000, 1),
+            'cairan' => (int) round($weight * 30),
         ];
     }
 
@@ -52,28 +54,19 @@ class NutritionCalculator
     private function bmr(float $weight, float $height, float $age, string $gender): float
     {
         if ($gender === 'Laki-laki') {
-            return 66.5 + (13.75 * $weight) + (5.003 * $height) - (6.775 * $age);
+            return 66 + (13.7 * $weight) + (5 * $height) - (6.8 * $age);
         }
 
-        return 655.1 + (9.563 * $weight) + (1.850 * $height) - (4.676 * $age);
+        return 655 + (9.6 * $weight) + (1.8 * $height) - (4.7 * $age);
     }
 
     private function activityFactor(string $activity): float
     {
         return [
             'Sangat Ringan' => 1.2,
-            'Ringan' => 1.4,
-            'Sedang' => 1.7,
-            'Berat' => 2.0,
+            'Ringan' => 1.375,
+            'Sedang' => 1.55,
+            'Berat' => 1.725,
         ][$activity];
-    }
-
-    private function adjustCalories(float $tee, string $statusGizi): float
-    {
-        return match ($statusGizi) {
-            'Kurus' => $tee + 300,
-            'Obesitas I', 'Obesitas II' => $tee - 500,
-            default => $tee,
-        };
     }
 }

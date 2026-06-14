@@ -64,12 +64,16 @@ class Pengguna extends Model
 
     public function rekamGizi(): HasMany
     {
-        return $this->hasMany(RekamGizi::class)->orderBy('tanggal', 'desc');
+        return $this->hasMany(RekamGizi::class)
+            ->orderBy('tanggal', 'desc')
+            ->orderBy('id', 'desc');
     }
 
     public function rekamGiziTerbaru(): HasOne
     {
-        return $this->hasOne(RekamGizi::class)->orderBy('tanggal', 'desc');
+        return $this->hasOne(RekamGizi::class)
+            ->orderBy('tanggal', 'desc')
+            ->orderBy('id', 'desc');
     }
 
     public function menuRekomendasi(): HasMany

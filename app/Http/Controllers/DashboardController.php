@@ -66,7 +66,10 @@ class DashboardController extends Controller
             $pengguna = $user->pengguna;
             $profilUser = $user->profilUser;
             $rekamGiziTerbaru = $pengguna
-                ? \App\Models\RekamGizi::where('pengguna_id', '=', $pengguna->id)->latest()->first()
+                ? \App\Models\RekamGizi::where('pengguna_id', '=', $pengguna->id)
+                    ->latest('tanggal')
+                    ->latest('id')
+                    ->first()
                 : null;
             $riwayatGulaDarah = $pengguna
                 ? \App\Models\RekamGizi::where('pengguna_id', $pengguna->id)
